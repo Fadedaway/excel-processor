@@ -1,7 +1,9 @@
 package com.jovi.magic.controller;
 
+import com.jovi.magic.service.PersonInfoService;
 import com.jovi.magic.util.ExampleEventUserModel;
 import com.jovi.magic.util.ExcelParser;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +26,9 @@ public class ExcelController {
     @Autowired
     private ExampleEventUserModel exampleEventUserModel;
 
+    @Autowired
+    private PersonInfoService personInfoService;
+
     @Value("${excel.file.path}")
     private String excelPath;
 
@@ -40,6 +45,9 @@ public class ExcelController {
 
             System.out.println(">>>>>>>>>>> " + datas.size());
 
+            if (CollectionUtils.isNotEmpty(datas)) {        //
+                personInfoService.analysePersonData(datas);
+            }
 //            exampleEventUserModel.processOneSheet(excelPath);
         } catch (Exception e) {
             e.printStackTrace();
