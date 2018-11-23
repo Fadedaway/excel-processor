@@ -10,4 +10,11 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface PersonInfoRepository extends JpaRepository<PersonInfo, Long> {
+
+    /**
+     * 根据身份证查询用户信息
+     * @param identityCard 身份证
+     * @return PersonInfo
+     */
+    PersonInfo findByIdentityCard(String identityCard);
 }

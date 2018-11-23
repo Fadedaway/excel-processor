@@ -59,7 +59,7 @@ public class PersonBuildingInfo {
     /**
      * 房间ID
      */
-    @Column(name = "房间id")
+    @Column(name = "room_id")
     private Long roomId;
 
     /**

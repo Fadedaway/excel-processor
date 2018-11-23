@@ -1,5 +1,6 @@
 package com.jovi.magic.service;
 
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -10,5 +11,5 @@ public interface PersonInfoService {
 
     void analysePersonData(List<String[]> dataList);
 
-    void installData(String[] data);
+    void installData(String[] data) throws ParseException;
 }
