@@ -72,7 +72,7 @@ public class PersonInfoServiceImpl implements PersonInfoService {
         dataSet = dataList.stream().filter(data -> StringUtils.isNotEmpty(data[18]) && (data[18].contains("嘉宏盛世商务广场10幢") || data[18].contains("双子星座公寓"))).collect(Collectors.toSet());
 
         // 根据身份证，地址信息去重
-        dataSet = dataSet.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(data -> data[18] + ";" + data[10]))), HashSet::new));
+        dataSet = dataSet.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(data -> data[18] + ";" + data[10] + ";" + data[16]))), HashSet::new));
 
         if (CollectionUtils.isEmpty(dataSet))
             return;
@@ -107,6 +107,11 @@ public class PersonInfoServiceImpl implements PersonInfoService {
 
             // 组装人员信息数据
             personInfo = installPersonInfo(data);
+        } else if (StringUtils.isEmpty(personInfo.getPhotoUrl()) && StringUtils.isNotEmpty(data[16])) {
+
+            personInfo.setPhotoUrl(data[16].trim());
+
+            personInfoRepository.save(personInfo);
         }
         // 组装身份证信息
         installCardInfo(personInfo);
@@ -161,10 +166,11 @@ public class PersonInfoServiceImpl implements PersonInfoService {
             else if ("2".equals(data[12]))
                 personInfo.setPersonGender("F");
         }
-//        if (StringUtils.isNotEmpty(data[16])) {     // 照片地址
+        if (StringUtils.isNotEmpty(data[16])) {     // 照片地址
 //            String imgUrl = data[16].trim().replace("LOC:", imgBaseUrl);
-//            personInfo.setPhotoUrl(imgUrl);
-//        }
+////            personInfo.setPhotoUrl(imgUrl);
+            personInfo.setPhotoUrl(data[16].trim());
+        }
         if (StringUtils.isNotEmpty(data[18])) {     // 户籍地址
             //personInfo.setDomicilePlace(DISTRICT_PREFIX + data[18].trim());
             if (data[18].contains("嘉宏盛世商务广场10幢"))
@@ -209,8 +215,17 @@ public class PersonInfoServiceImpl implements PersonInfoService {
         if (Objects.isNull(actualBuildingMap) || StringUtils.isEmpty(matchStr))
             return null;
 
-        if (actualBuildingMap.containsKey(matchStr))        //  设置楼宇id
+        if (actualBuildingMap.containsKey(matchStr)) {      //  设置楼宇id
+
+            Long buildingId = actualBuildingMap.get(matchStr).getId();
+
+            PersonBuildingInfo oldBuildingInfo = personBuildingInfoRepository.findByPersonIdAndBuildingId(personInfo.getId(), buildingId);
+
+            if (Objects.nonNull(oldBuildingInfo))       // 已经存在人员房屋对应关系
+                return null;
+
             personBuildingInfo.setBuildingId(actualBuildingMap.get(matchStr).getId());
+        }
         else
             return null;
 //        if (Objects.isNull(buildMap) || StringUtils.isEmpty(matchStr))
@@ -250,6 +265,18 @@ public class PersonInfoServiceImpl implements PersonInfoService {
         }
     }
 
+    @Override
+    public void fixData() {
+        List<PersonInfo> personInfoList = personInfoRepository.findAll();
+
+        if (CollectionUtils.isEmpty(personInfoList))
+            return;
+
+        personInfoList.forEach(personInfo -> {
+
+
+        });
+    }
 //    public static void main(String[] args) {
 //        String address = "双子星座公寓11幢1819室";
 //        Matcher matcher = Pattern.compile("[0-9]+").matcher(address);

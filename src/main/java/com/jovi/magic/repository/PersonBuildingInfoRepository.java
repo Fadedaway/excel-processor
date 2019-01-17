@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface PersonBuildingInfoRepository extends JpaRepository<PersonBuildingInfo, Long> {
+
+    PersonBuildingInfo findByPersonIdAndBuildingId(Long id, Long buildingId);
 }
