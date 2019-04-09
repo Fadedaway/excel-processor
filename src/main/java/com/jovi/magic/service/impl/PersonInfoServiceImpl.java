@@ -3,6 +3,8 @@ package com.jovi.magic.service.impl;
 import com.jovi.magic.entity.*;
 import com.jovi.magic.repository.*;
 import com.jovi.magic.service.PersonInfoService;
+import com.jovi.magic.util.FileUtil;
+import com.jovi.magic.util.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -93,7 +95,15 @@ public class PersonInfoServiceImpl implements PersonInfoService {
 //
 //        buildMap = buildList.stream().collect(Collectors.toMap(StandardAddressBuild::getStandardAddressName, Function.identity()));
 
-        dataSet.forEach(this::installData);
+        PersonInfoService personInfoServiceProxy = SpringUtil.getBean(PersonInfoService.class);
+
+        for (String[] strings : dataSet) {
+            try {
+                personInfoServiceProxy.installData(strings);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -275,6 +285,18 @@ public class PersonInfoServiceImpl implements PersonInfoService {
         personInfoList.forEach(personInfo -> {
 
 
+        });
+    }
+
+    @Override
+    public void processPersonData(List<String[]> dataList) {
+        String fileName = "UpdatePerson-" + new Date().getTime() + ".sql";
+
+        String filePath = "F:/" + fileName;
+        dataList.forEach(data -> {
+            String newLine = System.getProperty("line.separator");
+            String updateSql = "UPDATE person_info SET person_type = '" + data[1] + "' WHERE identity_card = '" + data[0] + "';" + newLine;
+            FileUtil.writeToFile(filePath, updateSql, true);
         });
     }
 //    public static void main(String[] args) {

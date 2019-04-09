@@ -14,4 +14,6 @@ public interface PersonInfoService {
     void installData(String[] data) throws ParseException;
 
     void fixData();
+
+    void processPersonData(List<String[]> dataList);
 }

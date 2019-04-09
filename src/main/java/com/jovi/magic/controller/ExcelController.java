@@ -36,6 +36,9 @@ public class ExcelController {
     @Value("${excel.file.path}")
     private String excelPath;
 
+    @Value("${excel.person.file.path}")
+    private String personFilePath;
+
     @GetMapping("readExcel")
     @ResponseBody
     public String readExcel() {
@@ -45,7 +48,7 @@ public class ExcelController {
             ExcelParser parse;
 
             parse = excelParser.parse(excelPath, 24);
-            List<String[]> datas = parse.getDatas();
+            List<String[]> datas = parse.getDatas(true);
 
             System.out.println(">>>>>>>>>>> " + datas.size());
 
@@ -104,5 +107,30 @@ public class ExcelController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @GetMapping(value = "readPersonInfo")
+    @ResponseBody
+    public String readPersonInfoExcel() {
+        if (StringUtils.isBlank(personFilePath))
+            return "Empty";
+
+        try {
+            ExcelParser parse;
+
+            parse = excelParser.parse(personFilePath, 2);
+            List<String[]> datas = parse.getDatas(false);
+
+            System.out.println(">>>>>>>>>>> " + datas.size());
+
+            if (CollectionUtils.isNotEmpty(datas)) {        //
+                personInfoService.processPersonData(datas);
+            }
+//            exampleEventUserModel.processOneSheet(excelPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Fail";
+        }
+        return "OK";
     }
 }
