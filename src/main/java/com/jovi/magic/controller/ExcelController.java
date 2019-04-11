@@ -119,7 +119,7 @@ public class ExcelController {
             ExcelParser parse;
 
             parse = excelParser.parse(personFilePath, 2);
-            List<String[]> datas = parse.getDatas(false);
+            List<String[]> datas = parse.getDatas(true);
 
             System.out.println(">>>>>>>>>>> " + datas.size());
 

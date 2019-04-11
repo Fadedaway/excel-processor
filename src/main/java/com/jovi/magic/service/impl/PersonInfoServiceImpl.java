@@ -292,11 +292,22 @@ public class PersonInfoServiceImpl implements PersonInfoService {
     public void processPersonData(List<String[]> dataList) {
         String fileName = "UpdatePerson-" + new Date().getTime() + ".sql";
 
+        String newLine = System.getProperty("line.separator");
         String filePath = "F:/" + fileName;
         dataList.forEach(data -> {
-            String newLine = System.getProperty("line.separator");
-            String updateSql = "UPDATE person_info SET person_type = '" + data[1] + "' WHERE identity_card = '" + data[0] + "';" + newLine;
-            FileUtil.writeToFile(filePath, updateSql, true);
+            if (StringUtils.isNotBlank(data[0]) && StringUtils.isNotBlank(data[1])) {
+                String typeName = "";
+                if ("0".equals(data[1]))
+                    typeName = "W";
+                if ("1".equals(data[1]))
+                    typeName = "P";
+                if ("2".equals(data[1]))
+                    typeName = "Z";
+                if ("3".equals(data[1]))
+                    typeName = "P";
+                String updateSql = "UPDATE person_info SET person_type = '" + typeName + "',updated_time = NOW() WHERE identity_card = '" + data[0] + "';" + newLine;
+                FileUtil.writeToFile(filePath, updateSql, true);
+            }
         });
     }
 //    public static void main(String[] args) {
